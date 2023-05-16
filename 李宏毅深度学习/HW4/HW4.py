@@ -200,16 +200,23 @@ def get_cosine_schedule_with_warmup(
          following a half-cosine).
        last_epoch (:obj:`int`, `optional`, defaults to -1):
          The index of the last epoch when resuming training.
+         学习率因子下个epoch进行更新的标志，默认为-1，即初始值时进行调整
 
      Return:
        :obj:`torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
      """
 
     def lr_lambda(current_step):
+        """current_step即为传入的epoch，返回值为学习率更新的因子"""
         # Warmup
+        """热身阶段：num_warmup_steps=1000，该函数返回两者之比,每1000steps更新一次"""
         if current_step < num_warmup_steps:
             return float(current_step)/float(max(1, num_warmup_steps))
         # decadence
+        """
+        下降阶段：num_training_steps总的阶段数(70000)，先计算下降阶段开始的阶段与总的下降阶段总阶段数的比值，
+        再返回
+        """
         progress = float(current_step - num_warmup_steps)/float(
             max(1, num_training_steps - num_warmup_steps)
         )
@@ -285,7 +292,7 @@ def parse_args():
     batch_size：训练用批次大小
     n_workers：线程数量
     valid_steps:训练模型中的batch数，事实上只有1952个，训练样本共有62494个
-    warmup_steps：
+    warmup_steps：热身的阶段数
     save_steps：保存模型steps，每10000steps保存一次模型
     total_steps：迭代的总的batch数
     """
