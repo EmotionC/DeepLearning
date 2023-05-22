@@ -214,12 +214,13 @@ def get_cosine_schedule_with_warmup(
             return float(current_step)/float(max(1, num_warmup_steps))
         # decadence
         """
-        下降阶段：num_training_steps总的阶段数(70000)，先计算下降阶段开始的阶段与总的下降阶段总阶段数的比值，
+        下降阶段：num_training_steps总的阶段数(70000)，先计算下降阶段开始的阶段与总的下降阶段总阶段数的比值(T_cur/T_i)，
         再返回
         """
         progress = float(current_step - num_warmup_steps)/float(
             max(1, num_training_steps - num_warmup_steps)
         )
+        """简化计算：lr_min=0, lr_max=1，括号内本身为pi*progress，"""
         return max(
             0.0, 0.5 * (1.0 + math.cos(math.pi * float(num_cycles) * 2.0 * progress))
         )
